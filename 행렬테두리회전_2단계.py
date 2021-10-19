@@ -1,5 +1,5 @@
 def solution(rows, columns, queries):
-    # 주어진 rows, columns값에 따라 1부터 rows*columns까지의 원소를 갖는 이중리스트 생성 
+    # 주어진 rows, columns값에 따라 1부터 rows*columns까지의 원소를 갖는 이중리스트 생성함
     list_double = []
     list_single = []
     for i in range(1, rows*columns + 1):
@@ -18,7 +18,7 @@ def solution(rows, columns, queries):
         list_index = []
         r = r1
         c = c1
-        while True:
+        while True:  
             list_index.append((r, c))
             if c < c2:
                 c += 1
