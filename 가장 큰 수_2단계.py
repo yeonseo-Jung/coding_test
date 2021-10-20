@@ -9,9 +9,9 @@ def solution(numbers):
         
         elif d == 2:
             if num[0] > num[1]:
-                num = num + f"{num[1]}.5"
+                num = num + f"{num[1]}.3"
             elif num[0] < num[1]:
-                num = num + f"{num[0]}.5"
+                num = num + f"{num[0]}.3"
             else:
                 num = num + f"{num[0]}"
         elif d == 4:
