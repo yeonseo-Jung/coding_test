@@ -12,12 +12,13 @@ def solution(lottos, win_nums):
         for j in win_nums:
             if i == j:
                 conc += 1
-                continue
+                break
             
     max = conc + count_zero
     min = conc
+    if max == 0:
+        max = 1
     if min == 0:
         min = 1
     answer = [7 - max, 7 - min]
-    
     return answer
