@@ -82,3 +82,9 @@ def solution(info, query):
             result.append(n)
         
     return result
+
+
+    info_dict = {"cpp": "a1", "java": "a2", "python": "a3", 
+        "junior": "b1", "senior": "b2", 
+        "frontend": "c1", "backend": "c2",
+        "chicken": "d1", "pizza": "d2"}
