@@ -1,90 +1,93 @@
-import pandas as pd
-
-def combination(arr, n):
-    if n == 0:
-        return [[]]
-    
-    result = []
-    for i in range(len(arr)):
-        m = arr[i]
-        rList = arr[i + 1:]
-        for s in combination(rList, n-1):
-            result.append([m] + s)
-            
-    return result
-
+# 2차 시도
+# 효율성 실패
 def solution(info, query):
-    # 배열 info를 정보별로 분류해서 list에 할당
-    infoList = []
+    info_dict = {"cpp": "a1", "java": "a2", "python": "a3",
+                "frontend": "b1", "backend": "b2",
+                "junior": "c1", "senior": "c2", 
+                "chicken": "d1", "pizza": "d2"}
+
+    # info배열을 이중리스트에 할당
+    # 사람별, 정보별로 데이터를 분리시키기 위함
+    info_double_list = []
     for s in info:
-        s = s.split()
-        score = int(s.pop())
-        s.append(score)
-        infoList.append(s)
-    # 분류된 배열 info_list를 DataFrame에 할당
-    infoData = pd.DataFrame(infoList, columns=["0", "1", "2", "3", "Score"])
-    # Score columns를 기준 오름차순으로 정렬
-    infoData = infoData.sort_values(by="Score").reset_index(drop=True)
-    # score list 생성
-    scoreList = list(infoData["Score"])
+        info_elem = s.split(" ")
+        info_double_list.append(info_elem)
+    # 점수 정보와 나머지 정보를 한 묶음으로 해서 한 사람의 info데이터를 두개 정보로 분리 
+    info_val = []
+    for i in info_double_list:
+        val = ""
+        for j in i[0:4]:
+            val += info_dict[j]
+        info_val.append([val, int(i[4])])
+    # 점수기준 오름차순 정렬    
+    info_val = sorted(info_val, key=lambda x:x[1])
 
-    arr = ['0', '1', '2', '3']
-    combList = []
-    for i in range(1, 5):
-        combList += combination(arr, i)
+    # query배열을 이중리스트에 할당
+    # 사람별, 정보별로 데이터를 분리시키기 위함
+    query_double_list = []
+    for s in query:
+        query_elem = s.split(" and ")
+        elem = query_elem[-1].split(" ")
+        del query_elem[-1]
+        query_elem = query_elem + elem
+        query_double_list.append(query_elem)  
 
-    infoData_16 = pd.DataFrame()
-    for a in combList:
-        s = ''.join(a)
-        empty_str = [""] * len(scoreList)
-        infoSeries = pd.Series(empty_str)
-        for i in a:
-            infoSeries += infoData.loc[:, i]
-        infoData_16[f'{s}'] = infoSeries
-    infoData_16['Score'] = scoreList
-
-    result = []
-    for q in query:
-        # query 배열에서 필요한 정보 추출하기
-        queries = q.replace("and ", "").split(" ")
-        infos = ""
-        q_info = ""
-        for i in range(len(queries) - 1):
-            if queries[i] == "-":
+    # 점수 정보와 나머지 정보를 한 묶음으로 해서 한 사람의 query데이터를 두개 정보로 분리 
+    query_val = []
+    for i in query_double_list:
+        val = ""
+        for j in i[0:4]:
+            if j == "-":
                 continue
             else:
-                infos += f'{i}'
-                q_info += queries[i]
-        q_score = int(queries[-1])
+                val += info_dict[j]
+        query_val.append([val, int(i[4])])
 
-        # score 조건 충족하는 info_data의 index 최솟값 찾기
-        if q_score > scoreList[-1]:
+    # 점수 조건 먼저 확인: 이진탐색으로 조건 만족하는 인덱스 최솟값 찾기 
+    result = []
+    for s in query_val:
+        q_score = s[1]
+        q_info = s[0]
+
+        if q_score > info_val[-1][1]:
             result.append(0)
-            continue
+
         else:
-            # lower bound binary search 
             init = 0
-            end = len(scoreList) - 1
+            end = len(info_val) - 1
+
             while init < end:
                 index = (init + end) // 2
-                if q_score <= scoreList[index]:
+
+                if q_score <= info_val[index][1]:
                     end = index
                 else:
                     init = index + 1
             init_index = init
 
-        if infos == "":
-            n = len(scoreList) - init_index
-            result.append(n)
-        else:
-            l = list(infoData_16.loc[init_index:, infos])
-            n = l.count(q_info)
-            result.append(n)
-        
+            # info조건 충족여부 판단 
+            n = len(q_info)
+            count = 0
+            for i in range(init_index, len(info_val)):
+                infos = info_val[i][0]
+
+                if n == 8:
+                    if q_info == infos:
+                        count += 1
+                elif n == 6:
+                    if q_info[0:2] in infos and q_info[2:4] in infos and q_info[4:6] in infos:
+                        count += 1
+
+                elif n == 4:
+                     if q_info[0:2] in infos and q_info[2:4] in infos:
+                        count += 1
+                elif n == 2:
+                    if q_info[0:2] in infos:
+                        count += 1
+                else:
+                    count += 1
+
+            result.append(count)
+            
     return result
 
-
-    info_dict = {"cpp": "a1", "java": "a2", "python": "a3", 
-        "junior": "b1", "senior": "b2", 
-        "frontend": "c1", "backend": "c2",
-        "chicken": "d1", "pizza": "d2"}
